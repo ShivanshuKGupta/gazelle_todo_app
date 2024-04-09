@@ -4,7 +4,7 @@ import 'package:gazelle_core/gazelle_core.dart';
 import 'package:gazelle_todo_app/todo.dart';
 
 class GazelleService {
-  static final app = GazelleApp(port: 8082);
+  static final app = GazelleApp(port: 8080);
   static final List<String> allRoutes = [
     '/',
     '/todos',
