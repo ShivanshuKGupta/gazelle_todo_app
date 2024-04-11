@@ -18,7 +18,6 @@ class GazelleService {
       id: '1',
       title: 'Learn Dart',
       description: 'Learn Dart programming language',
-      completed: false,
       createdAt: DateTime.now(),
       completedAt: DateTime.now(),
     ),
@@ -26,17 +25,13 @@ class GazelleService {
       id: '2',
       title: 'Learn Flutter',
       description: 'Learn Flutter framework',
-      completed: false,
       createdAt: DateTime.now(),
-      completedAt: DateTime.now(),
     ),
     Todo(
       id: '3',
       title: 'Raman Maharshi',
       description: 'Read about Ramana Maharshi',
-      completed: true,
       createdAt: DateTime.now(),
-      completedAt: DateTime.now(),
     ),
   ];
 
