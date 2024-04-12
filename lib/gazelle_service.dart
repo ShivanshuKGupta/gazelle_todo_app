@@ -4,15 +4,8 @@ import 'package:gazelle_core/gazelle_core.dart';
 import 'package:gazelle_todo_app/todo.dart';
 
 class GazelleService {
-  static final app = GazelleApp(port: 8080);
-  static final List<String> allRoutes = [
-    '/',
-    '/todos',
-    '/todos/:id',
-    '/create',
-    '/update/:id',
-    '/delete/:id',
-  ];
+  /// This is the GazelleApp instance that will be used to start the server.
+  static final app = GazelleApp(port: 8080, address: "localhost");
   static final List<Todo> todos = [
     Todo(
       id: '1',
@@ -35,53 +28,76 @@ class GazelleService {
     ),
   ];
 
+  /// This method starts the server and sets the routes.
   static Future<void> start() async {
     setRoutes();
     await app.start();
   }
 
+  /// This method sets the routes for the server.
   static void setRoutes() {
+    /// This route returns a welcome message.
+    /// It is a GET request to the root path.
     GazelleService.app.get(
       '/',
       (request) async {
         return GazelleResponse(
           statusCode: 200,
           body:
-              'This is a todo app. Use /todos to get all todos. All available routes are: ${GazelleService.allRoutes}',
+              'This is the backend for a todo app. All available routes are:\n/todos (to get all todos), \n/todos/:id (to get a todo with this id), \n/create (to create a new todo), \n/update/:id, \n/delete/:id (to delete a todo with this id)',
         );
       },
     );
+
+    /// This route returns all todos.
     GazelleService.app.get(
       '/todos',
       (request) async {
         return GazelleResponse(
+          // status code 200 means the request was successful.
           statusCode: 200,
+          // Even if the body is a list, it should be encoded to a string.
+          // We use jsonEncode to convert the list to a string.
           body: jsonEncode(GazelleService.todos),
         );
       },
       preRequestHooks: [authenticationHook],
       postRequestHooks: [loggerHook],
     );
+
+    /// This route returns a todo with a specific id.
     GazelleService.app.get('/todos/:id', (request) async {
+      // The pathParameters property of the request object contains the parameters in the path.
       print("request.pathParameters= ${request.pathParameters}");
       final id = request.pathParameters['id'];
       try {
+        // finding the todo with the id.
         final todo = GazelleService.todos.firstWhere((todo) => todo.id == id);
+        // if found then return the todo.
         return GazelleResponse(
           statusCode: 200,
           body: jsonEncode(todo),
         );
       } catch (e) {
+        // if not found then return an error message.
         return GazelleResponse(
           statusCode: 404,
           body: jsonEncode({"error": e.toString()}),
         );
       }
     });
+
+    /// This route creates a new todo.
     GazelleService.app.post('/create', (request) async {
       final body = jsonDecode(await request.body ?? "{}");
       try {
+        // setting the createdAt property of the new todo.
         body['createdAt'] = DateTime.now().toIso8601String();
+        // if the todo is not completed then completedAt should be null.
+        body['completedAt'] = null;
+        // setting the id of the new todo.
+        body['id'] = (int.parse(GazelleService.todos.lastOrNull?.id ?? "0") + 1)
+            .toString();
         final todo = Todo.fromJson(body);
         GazelleService.todos.add(todo);
         return GazelleResponse(
@@ -95,6 +111,8 @@ class GazelleService {
         );
       }
     });
+
+    /// This route updates a todo with a specific id.
     GazelleService.app.put('/update/:id', (request) async {
       final id = request.pathParameters['id'];
       final body = jsonDecode(await request.body ?? "{}");
@@ -120,6 +138,8 @@ class GazelleService {
         );
       }
     });
+
+    /// This route deletes a todo with a specific id.
     GazelleService.app.delete('/delete/:id', (request) async {
       final id = request.pathParameters['id'];
       try {
