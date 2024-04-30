@@ -47,8 +47,8 @@ class GazelleService {
     /// It is a GET request to the root path.
     GazelleService.app.get(
       '/',
-      (request) async {
-        return GazelleResponse(
+      (request, response) async {
+        return response.copyWith(
           statusCode: 200,
           body:
               'This is the backend for a gazelle todo app. All available routes are:\n/todos (to get all todos), \n/todos/:id (to get a todo with this id), \n/create (to create a new todo), \n/update/:id, \n/delete/:id (to delete a todo with this id)',
@@ -59,8 +59,8 @@ class GazelleService {
     /// This route returns all todos.
     GazelleService.app.get(
       '/todos',
-      (request) async {
-        return GazelleResponse(
+      (request, response) async {
+        return response.copyWith(
           // status code 200 means the request was successful.
           statusCode: 200,
           // Even if the body is a list, it should be encoded to a string.
@@ -69,11 +69,11 @@ class GazelleService {
         );
       },
       preRequestHooks: [authenticationHook],
-      postRequestHooks: [loggerHook],
+      postResponseHooks: [loggerHook],
     );
 
     /// This route returns a todo with a specific id.
-    GazelleService.app.get('/todos/:id', (request) async {
+    app.get('/todos/:id', (request, response) async {
       // The pathParameters property of the request object contains the parameters in the path.
       print("request.pathParameters= ${request.pathParameters}");
       final id = request.pathParameters['id'];
@@ -81,13 +81,13 @@ class GazelleService {
         // finding the todo with the id.
         final todo = GazelleService.todos.firstWhere((todo) => todo.id == id);
         // if found then return the todo.
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 200,
           body: jsonEncode(todo),
         );
       } catch (e) {
         // if not found then return an error message.
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 404,
           body: jsonEncode({"error": e.toString()}),
         );
@@ -95,7 +95,7 @@ class GazelleService {
     });
 
     /// This route creates a new todo.
-    GazelleService.app.post('/create', (request) async {
+    GazelleService.app.post('/create', (request, response) async {
       final body = jsonDecode(await request.body ?? "{}");
       try {
         // setting the createdAt property of the new todo.
@@ -107,12 +107,12 @@ class GazelleService {
             .toString();
         final todo = Todo.fromJson(body);
         GazelleService.todos.add(todo);
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 201,
           body: jsonEncode(todo),
         );
       } catch (e) {
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 400,
           body: jsonEncode({"error": e.toString()}),
         );
@@ -120,7 +120,7 @@ class GazelleService {
     });
 
     /// This route updates a todo with a specific id.
-    GazelleService.app.put('/update/:id', (request) async {
+    GazelleService.app.put('/update/:id', (request, response) async {
       final id = request.pathParameters['id'];
       final body = jsonDecode(await request.body ?? "{}");
       try {
@@ -134,12 +134,12 @@ class GazelleService {
         int index = GazelleService.todos.indexWhere((todo) => todo.id == id);
         GazelleService.todos.removeAt(index);
         GazelleService.todos.insert(index, updatedTodo);
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 200,
           body: jsonEncode(updatedTodo),
         );
       } catch (e) {
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 404,
           body: jsonEncode({"error": e.toString()}),
         );
@@ -147,17 +147,17 @@ class GazelleService {
     });
 
     /// This route deletes a todo with a specific id.
-    GazelleService.app.delete('/delete/:id', (request) async {
+    GazelleService.app.delete('/delete/:id', (request, response) async {
       final id = request.pathParameters['id'];
       try {
         final todo = GazelleService.todos.firstWhere((todo) => todo.id == id);
         GazelleService.todos.remove(todo);
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 200,
           body: jsonEncode(todo),
         );
       } catch (e) {
-        return GazelleResponse(
+        return response.copyWith(
           statusCode: 404,
           body: jsonEncode({"error": e.toString()}),
         );
@@ -166,22 +166,25 @@ class GazelleService {
   }
 
   static final authenticationHook = GazellePreRequestHook(
-    (request) async {
+    (request, response) async {
       if (!authenticated(request)) {
-        return GazelleResponse(
-          statusCode: 401,
-          body: 'Unauthorized',
+        return (
+          request,
+          response.copyWith(
+            statusCode: 401,
+            body: 'Unauthorized',
+          )
         );
       }
-      return request;
+      return (request, response);
     },
     shareWithChildRoutes: true,
   );
 
   static final loggerHook = GazellePostResponseHook(
-    (request) async {
-      // print(request.body);
-      return request;
+    (request, response) async {
+      print('Request: ${request.method} ${request.uri}');
+      return (request, response);
     },
     shareWithChildRoutes: true,
   );

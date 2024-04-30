@@ -7,7 +7,7 @@ environment:
   sdk: ^3.3.2
 
 dependencies:
-  gazelle_core: ^0.1.6
+  gazelle_core: ^0.2.0
   # path: ^1.8.0
 
 dev_dependencies:

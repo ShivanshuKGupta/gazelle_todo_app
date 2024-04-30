@@ -93,10 +93,10 @@ packages:
     dependency: "direct main"
     description:
       name: gazelle_core
-      sha256: "0320e33e810c24821309a4516120a1ef8086425b713837491f0a53412521452c"
+      sha256: "8941ea80d566c0185b52344c4f5834cd36ed27226f246927a563ea567e9abe16"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.6"
+    version: "0.2.0"
   glob:
     dependency: transitive
     description:
