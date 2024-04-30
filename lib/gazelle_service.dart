@@ -5,7 +5,7 @@ import 'package:gazelle_todo_app/todo.dart';
 
 class GazelleService {
   /// This is the GazelleApp instance that will be used to start the server.
-  static final app = GazelleApp(port: 8080, address: "localhost");
+  static final app = GazelleApp(port: 8080);
   static final List<Todo> todos = [
     Todo(
       id: '1',
@@ -26,6 +26,13 @@ class GazelleService {
       description: 'Read about Ramana Maharshi',
       createdAt: DateTime.now(),
     ),
+    Todo(
+      id: '4',
+      title: 'Raman Tank',
+      description: 'Read about Raman Tank',
+      createdAt: DateTime(2002, 2, 4),
+      completedAt: DateTime.now(),
+    ),
   ];
 
   /// This method starts the server and sets the routes.
@@ -44,7 +51,7 @@ class GazelleService {
         return GazelleResponse(
           statusCode: 200,
           body:
-              'This is the backend for a todo app. All available routes are:\n/todos (to get all todos), \n/todos/:id (to get a todo with this id), \n/create (to create a new todo), \n/update/:id, \n/delete/:id (to delete a todo with this id)',
+              'This is the backend for a gazelle todo app. All available routes are:\n/todos (to get all todos), \n/todos/:id (to get a todo with this id), \n/create (to create a new todo), \n/update/:id, \n/delete/:id (to delete a todo with this id)',
         );
       },
     );
@@ -173,7 +180,7 @@ class GazelleService {
 
   static final loggerHook = GazellePostResponseHook(
     (request) async {
-      print(request.body);
+      // print(request.body);
       return request;
     },
     shareWithChildRoutes: true,

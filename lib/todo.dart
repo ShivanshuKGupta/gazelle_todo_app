@@ -1,4 +1,3 @@
-/// The Todo Model
 class Todo {
   /// The unique identifier of the todo, this identifier will be used to uniquely identify the todo
   String id;

@@ -1,2 +1,1 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+This is a sample project made for demonstrating the use of Gazelle, by creating a backend service for a todo app.
