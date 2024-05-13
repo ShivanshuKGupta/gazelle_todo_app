@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gazelle_core/gazelle_core.dart';
 import 'package:gazelle_todo_app/todo.dart';
 
 class GazelleService {
   /// This is the GazelleApp instance that will be used to start the server.
-  static final app = GazelleApp(port: 8080);
+  static final app = GazelleApp(
+    address: "0.0.0.0",
+    port: int.tryParse(Platform.environment["PORT"] ?? "8080") ?? 8080,
+  );
   static final List<Todo> todos = [
     Todo(
       id: '1',
